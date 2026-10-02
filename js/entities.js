@@ -132,10 +132,10 @@ class Boss {
     this.tx = W / 2;
     this.ty = 38;
     this.r = 40;
-    this.maxHp = 280;
+    this.maxHp = 400;
     this.hp = this.maxHp;
-    this.shieldHp = 120;
-    this.shieldMax = 120;
+    this.shieldHp = 180;
+    this.shieldMax = 180;
     this.phase = 0;          // 0=entering,1=shielded,2=vulnerable,3=enraged
     this.t = 0;
     this.fireT = 2;
@@ -219,41 +219,39 @@ class Boss {
       this.volley++;
       if (this.phase === 1) {          // shielded: sweeping fan that pans left-right
         const sweep = Math.sin(this.volley * 0.9) * 0.55;
-        for (let k = 0; k < 4; k++) {
-          const a = Math.atan2(dy, dx) + sweep + (k - 1.5) * 0.17;
+        for (let k = 0; k < 3; k++) {
+          const a = Math.atan2(dy, dx) + sweep + (k - 1) * 0.2;
           game.enemyBullets.push(new Bullet(this.x, this.y + 20,
             Math.cos(a) * 56, Math.sin(a) * 56, false, 'bullet_red2'));
         }
-        this.fireT = 1.35;
+        this.fireT = 1.55;
       } else if (this.phase === 2) {   // vulnerable: alternating spiral arcs + ring burst
         if (this.volley % 4 === 0) {
-          for (let k = 0; k < 8; k++) {
-            const a = (k / 8) * Math.PI * 2 + this.volley * 0.2;
+          for (let k = 0; k < 6; k++) {
+            const a = (k / 6) * Math.PI * 2 + this.volley * 0.2;
             game.enemyBullets.push(new Bullet(this.x, this.y + 14,
               Math.cos(a) * 48, Math.sin(a) * 48, false, 'orb_purple'));
           }
         } else {
           const dir = this.volley % 2 === 0 ? 1 : -1;
-          for (let k = 0; k < 5; k++) {
-            const a = Math.PI * 0.5 + dir * (k - 2) * 0.24 + dir * this.volley * 0.12;
+          for (let k = 0; k < 4; k++) {
+            const a = Math.PI * 0.5 + dir * (k - 1.5) * 0.26 + dir * this.volley * 0.12;
             game.enemyBullets.push(new Bullet(this.x, this.y + 14,
               Math.cos(a) * 58, Math.sin(a) * 58, false, 'orb_purple'));
           }
         }
-        this.fireT = 1.05;
+        this.fireT = 1.25;
       } else {                          // enraged: counter-rotating rings + missile pair
-        for (let k = 0; k < 12; k++) {
+        for (let k = 0; k < 8; k++) {
           const dir = k % 2 === 0 ? 1 : -1;
-          const a = (k / 12) * Math.PI * 2 + dir * this.volley * 0.28;
+          const a = (k / 8) * Math.PI * 2 + dir * this.volley * 0.28;
           game.enemyBullets.push(new Bullet(this.x, this.y + 14,
             Math.cos(a) * 44, Math.sin(a) * 44, false, 'orb_purple'));
         }
         const a = Math.atan2(dy, dx);
-        for (const off of [-0.12, 0.12]) {
-          game.enemyBullets.push(new Bullet(this.x, this.y + 20,
-            Math.cos(a + off) * 72, Math.sin(a + off) * 72, false, 'missile_purple'));
-        }
-        this.fireT = 1.2;
+        game.enemyBullets.push(new Bullet(this.x, this.y + 20,
+          Math.cos(a) * 72, Math.sin(a) * 72, false, 'missile_purple'));
+        this.fireT = 1.4;
       }
     }
     // main cannon: charge -> lock -> beam

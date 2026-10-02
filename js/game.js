@@ -724,22 +724,6 @@ class Game {
     this.text(ctx, 'DOOMSDAY', W / 2, 16, '#f66', 5, 'center');
     if ((this.stateT * 2 | 0) % 2 === 0)
       this.text(ctx, 'PRESS SPACE TO START', W / 2, 66, '#fff', 2, 'center');
-    // retro terminal box: controls, bottom-left
-    const bx = 4, by = 120, bw = 92, bh = 56;
-    ctx.fillStyle = 'rgba(2,10,20,0.78)';
-    ctx.fillRect(bx, by, bw, bh);
-    ctx.strokeStyle = '#2af';
-    ctx.globalAlpha = 0.55;
-    ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = '#2af';
-    ctx.fillRect(bx + 4, by + 2, 18, 1);
-    const scan = 1 + ((this.stateT * 14 | 0) % (bh - 4));
-    ctx.fillStyle = 'rgba(60,180,255,0.08)';
-    ctx.fillRect(bx + 1, by + scan, bw - 2, 1);
-    this.text(ctx, 'CONTROLS', bx + 8, by + 6, '#4df', 1);
-    const ctrls = ['WASD  MOVE', 'SPACE SHOOT', 'E     POWER-UP', 'SHIFT BOOST', 'P PAUSE  M MUTE'];
-    ctrls.forEach((c, i) => this.text(ctx, c, bx + 8, by + 17 + i * 8, '#8ef', 1));
   }
 
   drawDifficulty(ctx) {
