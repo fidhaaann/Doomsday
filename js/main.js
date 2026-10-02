@@ -22,14 +22,20 @@
       ctx.imageSmoothingEnabled = false;
       window.RENDER_SX = canvas.width / W;        // full-fill scale (bg)
       window.RENDER_SY = canvas.height / H;
-      let wx = window.RENDER_SX, wy = window.RENDER_SY;
-      const MAX_DISTORT = 1.5;
+      const portrait = canvas.height > canvas.width;
+      // portrait phones: HUD band pinned to the very top of the screen,
+      // world gets the space below it; landscape: world fills everything.
+      window.HUD_PX = portrait ? Math.round(canvas.width * 0.17) : 0;
+      const availH = canvas.height - window.HUD_PX;
+      let wx = window.RENDER_SX;
+      let wy = portrait ? availH / H : window.RENDER_SY;
+      const MAX_DISTORT = portrait ? 1.8 : 1.5;
       if (wx / wy > MAX_DISTORT) wx = wy * MAX_DISTORT;
       if (wy / wx > MAX_DISTORT) wy = wx * MAX_DISTORT;
       window.RENDER_WX = wx;
       window.RENDER_WY = wy;
       window.RENDER_OX = (canvas.width - W * wx) / 2;
-      window.RENDER_OY = (canvas.height - H * wy) / 2;
+      window.RENDER_OY = window.HUD_PX + (availH - H * wy) / 2;
       window.RENDER_SCALE = Math.min(wx, wy);
       return;
     }
@@ -47,6 +53,7 @@
       window.RENDER_SX = S; window.RENDER_SY = S;
       window.RENDER_WX = S; window.RENDER_WY = S;
       window.RENDER_OX = 0; window.RENDER_OY = 0;
+      window.HUD_PX = 0;
     }
   }
   window.addEventListener('resize', fit);

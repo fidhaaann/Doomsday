@@ -516,7 +516,7 @@ class Game {
       this.player.draw(ctx);
       for (const e of this.explosions) e.draw(ctx);
       Particles.draw(ctx);
-      this.drawHUD(ctx);
+      if (!window.HUD_PX) this.drawHUD(ctx);
     } else {
       Particles.draw(ctx);
     }
@@ -542,6 +542,7 @@ class Game {
       case 'victory': this.drawVictory(ctx); break;
       case 'paused': this.drawPaused(ctx); break;
     }
+    if (window.HUD_PX && this.state !== 'menu' && this.state !== 'difficulty') this.drawHUDScreen(ctx);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
@@ -608,6 +609,69 @@ class Game {
       } else {
         this.bar(ctx, W / 2 - 50, 34, 100, 4, this.boss.hp / this.boss.maxHp, this.boss.phase === 3 ? '#f44' : '#c4f');
       }
+    }
+  }
+
+  // portrait phones: HUD pinned to the top of the screen in device px
+  drawHUDScreen(ctx) {
+    const cw = ctx.canvas.width, band = window.HUD_PX;
+    const t = Math.max(0, Math.ceil(this.timer));
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = 'rgba(2,4,18,0.85)';
+    ctx.fillRect(0, 0, cw, band);
+    ctx.strokeStyle = 'rgba(80,140,255,0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, band); ctx.lineTo(cw, band); ctx.stroke();
+    const s = Math.max(3, Math.round(band / 38));
+    const gh = 5 * s;
+    const y1 = Math.round(band * 0.08);
+    const y2 = Math.round(band * 0.44);
+    const y3 = Math.round(band * 0.72);
+    const xL = Math.round(cw * 0.015);
+    const xE = Math.round(cw * 0.20);
+    const xP = Math.round(cw * 0.42);
+    const xS = Math.round(cw * 0.64);
+    const xW = Math.round(cw * 0.74);   // right column ends before the DOM pause button
+    pixText(ctx, 'LEVEL ' + this.level + '/5', xL, y1, s, '#8ef');
+    pixText(ctx, 'EARTH', xE, y1, s, '#678');
+    pixText(ctx, 'PLAYER', xP, y1, s, '#678');
+    pixText(ctx, 'SCORE', xS, y1, s, '#678');
+    pixText(ctx, 'POWER', xW, y1, s, '#678');
+    pixText(ctx, 'TIME ' + String(t).padStart(2, '0'), xL, y2, s, t <= 10 ? '#f44' : '#fff');
+    const bw = Math.round(cw * 0.19), bh = Math.max(4, Math.round(band * 0.10));
+    this.bar(ctx, xE, y2, bw, bh, this.earth.hp / CFG.earthHp,
+      this.earth.hp > 60 ? '#4af' : this.earth.hp > 30 ? '#fa4' : '#f44');
+    this.bar(ctx, xP, y2, bw, bh, this.player.hp / CFG.playerHp,
+      this.player.hp > 50 ? '#4f4' : this.player.hp > 25 ? '#fa4' : '#f44');
+    pixText(ctx, String(this.score).padStart(7, '0'), xS, y2, s, '#ff8');
+    if (this.player.stored.length) {
+      const front = this.player.stored[0];
+      pixText(ctx, PU_NAME[front] + (this.player.stored.length > 1 ? ' +' + (this.player.stored.length - 1) : ''), xW, y2, s, PU_COLOR[front]);
+    } else {
+      pixText(ctx, '---', xW, y2, s, '#456');
+    }
+    // row 3: lives + combo + active effects
+    pixText(ctx, 'LIVES', xL, y3, s, '#678');
+    for (let i = 0; i < this.lives; i++) {
+      drawSprite(ctx, 'player_ship2', xL + 23 * s + i * Math.round(5.5 * s), y3 - s, Math.round(4 * s), Math.round(4.5 * s));
+    }
+    if (this.combo >= 2) pixText(ctx, 'COMBO X' + this.combo, xS, y3, s, '#8ff');
+    let ey = y3;
+    if (this.player.shield > 0) { pixText(ctx, 'SHIELD ' + Math.ceil(this.player.shield), xP, ey, s, '#4df'); ey += gh + s; }
+    if (this.player.rapid > 0) { pixText(ctx, 'RAPID ' + Math.ceil(this.player.rapid), xP, ey, s, '#f43'); ey += gh + s; }
+    if (this.player.triple > 0) { pixText(ctx, 'TRIPLE ' + Math.ceil(this.player.triple), xP, ey, s, '#4f4'); ey += gh + s; }
+    ctx.restore();
+    // boss bar hangs just under the HUD band
+    if (this.boss && this.boss.phase >= 1 && !this.boss.dead) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      const bW = Math.round(cw * 0.6), bx = Math.round((cw - bW) / 2);
+      const frac = this.boss.phase === 1 ? this.boss.shieldHp / this.boss.shieldMax : this.boss.hp / this.boss.maxHp;
+      this.bar(ctx, bx, band + 6, bW, Math.max(6, Math.round(band * 0.07)), frac,
+        this.boss.phase === 1 ? '#4df' : this.boss.phase === 3 ? '#f44' : '#c4f');
+      pixText(ctx, 'MOTHERSHIP', cw / 2, band + 6 + Math.round(band * 0.11), Math.max(2, Math.round(s * 0.8)), '#f4a', 'center');
+      ctx.restore();
     }
   }
 
