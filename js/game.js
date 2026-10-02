@@ -255,12 +255,9 @@ class Game {
     const [vMin, vMax] = lvl.speed;
     const D = DIFFS[this.diff];
     const sp = (vMin + Math.random() * (vMax - vMin)) * D.spd;
-    // spawn from top or upper sides, aimed near Earth with spread
-    let x, y;
-    const edge = Math.random();
-    if (edge < 0.7) { x = Math.random() * W; y = -14; }
-    else if (edge < 0.85) { x = -14; y = Math.random() * H * 0.4; }
-    else { x = W + 14; y = Math.random() * H * 0.4; }
+    // spawn from the top, aimed near Earth with spread
+    const x = Math.random() * W;
+    const y = -14;
     const tx = this.earth.x + (Math.random() - 0.5) * 130;
     const ty = this.earth.y + (Math.random() - 0.5) * 10;
     const dx = tx - x, dy = ty - y;
@@ -488,9 +485,14 @@ class Game {
     const ctx = this.ctx;
     const WX = window.RENDER_WX || window.RENDER_SCALE || 2;
     const WY = window.RENDER_WY || window.RENDER_SCALE || 2;
-    // nebula bg always fills the whole canvas (no plain black bars on phones)
+    // nebula bg: fills the whole canvas, or just the console screen on portrait phones
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.drawImage(this.bg, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    if (window.CONSOLE) {
+      window.drawConsoleShell();
+      ctx.drawImage(this.bg, window.RENDER_OX, window.RENDER_OY, W * WX, H * WY);
+    } else {
+      ctx.drawImage(this.bg, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    }
     ctx.setTransform(WX, 0, 0, WY, window.RENDER_OX || 0, window.RENDER_OY || 0);   // world logic stays 320x180
     ctx.save();
     ctx.translate(Math.round(Shake.ox()), Math.round(Shake.oy()));

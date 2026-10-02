@@ -29,19 +29,39 @@
       document.body.appendChild(probe);
       window.SAFE_TOP_PX = Math.round((probe.offsetHeight || 0) * dpr) + Math.round(8 * dpr);
       probe.remove();
-      // portrait phones: HUD band pinned to the very top of the screen,
-      // world gets the space below it; landscape: world fills everything.
-      window.HUD_PX = portrait ? Math.round(canvas.width * 0.24) + window.SAFE_TOP_PX : 0;
-      const availH = canvas.height - window.HUD_PX;
+      if (portrait) {
+        // Game Boy layout: framed screen up top, console body + buttons below.
+        // The screen never reaches the URL bar, so the in-screen HUD stays visible.
+        window.HUD_PX = 0;                       // HUD draws inside the screen
+        const m = Math.round(canvas.width * 0.022);
+        const scrX = Math.round(canvas.width * 0.045);
+        const scrW = canvas.width - 2 * scrX;
+        const scrY = window.SAFE_TOP_PX + Math.round(canvas.width * 0.16);
+        const scrH = Math.round(canvas.height * 0.46);
+        window.CONSOLE = { x: scrX, y: scrY, w: scrW, h: scrH };
+        const ww = scrW - 2 * m, wh = scrH - 2 * m;
+        let wx = ww / W, wy = wh / H;
+        const MAX_DISTORT = 1.55;
+        if (wy / wx > MAX_DISTORT) wy = wx * MAX_DISTORT;
+        if (wx / wy > MAX_DISTORT) wx = wy * MAX_DISTORT;
+        window.RENDER_WX = wx;
+        window.RENDER_WY = wy;
+        window.RENDER_OX = scrX + m + (ww - W * wx) / 2;
+        window.RENDER_OY = scrY + m + (wh - H * wy) / 2;
+        window.RENDER_SCALE = Math.min(wx, wy);
+        return;
+      }
+      window.HUD_PX = 0;
+      window.CONSOLE = null;
       let wx = window.RENDER_SX;
-      let wy = portrait ? availH / H : window.RENDER_SY;
-      const MAX_DISTORT = portrait ? 1.8 : 1.5;
+      let wy = window.RENDER_SY;
+      const MAX_DISTORT = 1.5;
       if (wx / wy > MAX_DISTORT) wx = wy * MAX_DISTORT;
       if (wy / wx > MAX_DISTORT) wy = wx * MAX_DISTORT;
       window.RENDER_WX = wx;
       window.RENDER_WY = wy;
       window.RENDER_OX = (canvas.width - W * wx) / 2;
-      window.RENDER_OY = window.HUD_PX + (availH - H * wy) / 2;
+      window.RENDER_OY = (canvas.height - H * wy) / 2;
       window.RENDER_SCALE = Math.min(wx, wy);
       return;
     }
@@ -60,6 +80,7 @@
       window.RENDER_WX = S; window.RENDER_WY = S;
       window.RENDER_OX = 0; window.RENDER_OY = 0;
       window.HUD_PX = 0;
+      window.CONSOLE = null;
     }
   }
   window.addEventListener('resize', fit);
@@ -139,6 +160,37 @@
     if (!['intro', 'playing', 'dying', 'paused'].includes(game.state)) game.handleKey(' ');
   });
 
+  // console shell: body gradient, screen bezel, logo, LED, hints
+  window.drawConsoleShell = function () {
+    const R = window.CONSOLE;
+    if (!R) return;
+    const cw = canvas.width, chh = canvas.height;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const g = ctx.createLinearGradient(0, 0, 0, chh);
+    g.addColorStop(0, '#45455e'); g.addColorStop(0.55, '#33334a'); g.addColorStop(1, '#23232f');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, cw, chh);
+    const ls = Math.max(4, Math.round(cw * 0.013));
+    pixText(ctx, 'DOOMSDAY', cw / 2, R.y - Math.round(cw * 0.11), ls, '#e66', 'center');
+    ctx.fillStyle = '#f33';
+    ctx.fillRect(Math.round(cw * 0.07), R.y - Math.round(cw * 0.075), Math.round(cw * 0.018), Math.round(cw * 0.018));
+    pixText(ctx, 'POWER', Math.round(cw * 0.10), R.y - Math.round(cw * 0.068), Math.max(2, Math.round(ls * 0.55)), '#889', 'left');
+    ctx.fillStyle = '#101018';
+    ctx.fillRect(R.x, R.y, R.w, R.h);
+    ctx.strokeStyle = 'rgba(130,140,200,0.4)';
+    ctx.lineWidth = Math.max(2, Math.round(cw * 0.003));
+    ctx.strokeRect(R.x + 1, R.y + 1, R.w - 2, R.h - 2);
+    ctx.fillStyle = '#02040e';
+    ctx.fillRect(window.RENDER_OX, window.RENDER_OY, W * window.RENDER_WX, H * window.RENDER_WY);
+    // speaker grille + control hints on the console body
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    const gy = Math.round(chh * 0.80);
+    for (let i = 0; i < 6; i++) {
+      ctx.fillRect(Math.round(cw * 0.05) + i * Math.round(cw * 0.022), gy, Math.round(cw * 0.008), Math.round(cw * 0.10));
+    }
+    pixText(ctx, 'SLIDE ON SCREEN TO MOVE', cw / 2, Math.round(chh * 0.56), Math.max(3, Math.round(cw * 0.009)), '#99a', 'center');
+  };
+
   let game = null;
   function startGame() {
     game = new Game(ctx);
@@ -175,6 +227,7 @@
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#020210';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (window.CONSOLE) window.drawConsoleShell();
     ctx.setTransform(WX, 0, 0, WY, window.RENDER_OX || 0, window.RENDER_OY || 0);
     ctx.fillRect(0, 0, W, H);
     for (let i = 0; i < 40; i++) {

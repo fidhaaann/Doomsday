@@ -20,17 +20,17 @@
   }
   /* ---- mobile touch controls ---- */
   #touch{display:none;position:fixed;inset:0;z-index:10;pointer-events:none;font-family:monospace;}
-  .tbtn{pointer-events:auto;position:absolute;width:76px;height:76px;border-radius:18px;
-    border:2px solid rgba(140,180,255,.55);background:rgba(20,30,70,.35);color:#9cf;
-    font:bold 22px monospace;display:flex;align-items:center;justify-content:center;touch-action:none;}
+  .tbtn{pointer-events:auto;position:absolute;width:16vmin;height:16vmin;border-radius:3vmin;
+    border:2px solid rgba(140,180,255,.55);background:rgba(20,30,70,.45);color:#9cf;
+    font:bold 4vmin monospace;display:flex;align-items:center;justify-content:center;touch-action:none;}
   .tbtn.on{background:rgba(255,150,40,.4);border-color:#fc8;color:#ffe08a;}
-  #tFire{right:16px;bottom:42px;width:112px;height:112px;border-radius:50%;
-    border-color:rgba(255,120,80,.65);color:#fa8;}
-  #tBoost{right:16px;bottom:164px;font-size:16px;}
-  #tPow{right:16px;bottom:250px;font-size:16px;position:absolute;}
+  #tFire{right:4vw;bottom:13vh;width:24vmin;height:24vmin;border-radius:50%;
+    border-color:rgba(255,120,80,.75);color:#fa8;border-width:3px;font-size:5vmin;}
+  #tBoost{right:32vw;bottom:6vh;font-size:3.6vmin;}
+  #tPow{left:8vw;bottom:6vh;font-size:3.6vmin;position:absolute;}
   #tPowN{position:absolute;top:-10px;right:-10px;background:#fc4;color:#000;
     border-radius:9px;font:bold 14px monospace;padding:2px 6px;display:none;}
-  #tPause{left:14px;bottom:14px;width:54px;height:44px;font-size:14px;}
+  #tPause{left:40vw;bottom:3.5vh;width:13vmin;height:6.5vmin;font-size:3vmin;border-radius:3vmin;}
   @media (orientation: landscape) and (pointer: coarse){
     .tbtn{width:62px;height:62px;font-size:17px;}
     #tFire{right:14px;bottom:30px;width:88px;height:88px;}
