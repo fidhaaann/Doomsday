@@ -233,7 +233,15 @@
     ctx.fillStyle = '#4f8';
     ctx.fillRect(W / 2 - bw / 2, 52, bw * loadProgress, 3);
     pixText(ctx, loadDone ? 'READY' : 'LOADING...', W / 2, 62, 1, '#678', 'center');
-    const lines = [
+    const touch = navigator.maxTouchPoints > 0;
+    const lines = touch ? [
+      ['HOW TO PLAY', '#8ef'],
+      ['SLIDE - MOVE   FIRE - SHOOT', '#cde'],
+      ['PWR - USE POWER-UP', '#cde'],
+      ['', '#000'],
+      ['SURVIVE 60 SECONDS EACH LEVEL', '#fc8'],
+      ['DESTROY THE MOTHERSHIP IN LEVEL 5', '#f8a'],
+    ] : [
       ['HOW TO PLAY', '#8ef'],
       ['WASD / ARROWS - MOVE', '#cde'],
       ['SPACE - SHOOT', '#cde'],
