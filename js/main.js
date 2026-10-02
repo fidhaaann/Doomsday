@@ -23,9 +23,15 @@
       window.RENDER_SX = canvas.width / W;        // full-fill scale (bg)
       window.RENDER_SY = canvas.height / H;
       const portrait = canvas.height > canvas.width;
+      // notch / status-bar safe area in device px
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed;top:0;left:0;padding-top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none';
+      document.body.appendChild(probe);
+      window.SAFE_TOP_PX = Math.round((probe.offsetHeight || 0) * dpr) + Math.round(8 * dpr);
+      probe.remove();
       // portrait phones: HUD band pinned to the very top of the screen,
       // world gets the space below it; landscape: world fills everything.
-      window.HUD_PX = portrait ? Math.round(canvas.width * 0.17) : 0;
+      window.HUD_PX = portrait ? Math.round(canvas.width * 0.24) + window.SAFE_TOP_PX : 0;
       const availH = canvas.height - window.HUD_PX;
       let wx = window.RENDER_SX;
       let wy = portrait ? availH / H : window.RENDER_SY;
@@ -90,11 +96,27 @@
     b.addEventListener('pointercancel', off);
     b.addEventListener('pointerleave', off);
   }
-  bindHold('padUp', 'w');
-  bindHold('padLeft', 'a');
-  bindHold('padDown', 's');
-  bindHold('padRight', 'd');
   bindHold('tFire', ' ');
+  // slide-finger movement: drag anywhere on the canvas, the ship follows
+  // relative finger motion (like Galaxy Attack / 1945 style controls)
+  let dragId = null, lastTX = 0, lastTY = 0;
+  window.__dragDX = 0; window.__dragDY = 0;
+  canvas.addEventListener('pointerdown', e => {
+    if (!isTouch || !game) return;
+    if (!['intro', 'playing', 'dying'].includes(game.state)) return;
+    dragId = e.pointerId; lastTX = e.clientX; lastTY = e.clientY;
+    canvas.setPointerCapture(e.pointerId);
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (e.pointerId !== dragId) return;
+    const dpr = window.devicePixelRatio || 1;
+    window.__dragDX += (e.clientX - lastTX) * dpr / (window.RENDER_WX || 1) * 1.15;
+    window.__dragDY += (e.clientY - lastTY) * dpr / (window.RENDER_WY || 1) * 1.15;
+    lastTX = e.clientX; lastTY = e.clientY;
+  });
+  const dragEnd = e => { if (e.pointerId === dragId) dragId = null; };
+  canvas.addEventListener('pointerup', dragEnd);
+  canvas.addEventListener('pointercancel', dragEnd);
   document.getElementById('tBoost').addEventListener('pointerdown', e => {
     e.preventDefault();
     keys['shift'] = !keys['shift'];

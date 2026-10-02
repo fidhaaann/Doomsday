@@ -73,12 +73,11 @@ class Asteroid {
 }
 
 class Alien {
-  constructor(side, y, targetX) {
-    this.side = side;                       // -1 from left, +1 from right
-    this.x = side < 0 ? -16 : W + 16;
-    this.y = y;
+  constructor(y, targetX) {
+    this.x = targetX;                       // enters from the top
+    this.y = -16;
+    this.vy = 26 + Math.random() * 18;
     this.baseY = y;
-    this.vx = -side * (16 + Math.random() * 14);
     this.tx = targetX;                      // hover x near this
     this.t = Math.random() * 6;
     this.hp = 3;
@@ -91,12 +90,10 @@ class Alien {
   }
   update(dt, game) {
     this.t += dt;
-    this.x += this.vx * dt;
-    // ease toward hover point
     if (!this.entered) {
-      if (Math.abs(this.x - this.tx) < 6) this.entered = true;
+      this.y += this.vy * dt;               // dive in from the top
+      if (this.y >= this.baseY) { this.y = this.baseY; this.entered = true; }
     } else {
-      this.vx *= 0.98;
       this.x += Math.sin(this.t * 1.4) * 12 * dt;
       this.y = this.baseY + Math.sin(this.t * 1.1) * 14;
       this.fireT -= dt;
@@ -110,7 +107,7 @@ class Alien {
       }
     }
     if (this.flash > 0) this.flash -= dt;
-    if ((this.side < 0 && this.x > W + 30) || (this.side > 0 && this.x < -30)) this.dead = true;
+    if (this.y > H + 30) this.dead = true;
   }
   hit(d) { this.hp -= d; this.flash = 0.08; return this.hp <= 0; }
   draw(ctx) {
@@ -286,7 +283,7 @@ class Boss {
       this.spawnT = this.phase >= 3 ? 6 : 8;
       if (game.aliens.length < 3) {
         const side = Math.random() < 0.5 ? -1 : 1;
-        game.aliens.push(new Alien(side, 30 + Math.random() * 40, this.x + side * 60));
+        game.aliens.push(new Alien(30 + Math.random() * 40, Math.max(24, Math.min(W - 24, this.x + side * 60))));
       }
     }
     // phase transitions
@@ -440,6 +437,14 @@ class Player {
         Particles.spawn(this.x + (Math.random() - 0.5) * 3, this.y + 9,
           { n: 1, colors: ['#f80', '#fc4', '#f42'], speed: 14, life: 0.35 });
       }
+    }
+    // slide-finger drag (touch): ship follows relative finger motion
+    if (window.__dragDX || window.__dragDY) {
+      this.x += window.__dragDX;
+      this.y += window.__dragDY;
+      this.engine += 0.03;
+      window.__dragDX = 0;
+      window.__dragDY = 0;
     }
     this.x = Math.max(8, Math.min(W - 8, this.x));
     this.y = Math.max(14, Math.min(H - 24, this.y));

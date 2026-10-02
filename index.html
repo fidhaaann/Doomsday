@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>DOOMSDAY</title>
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <style>
@@ -24,36 +24,25 @@
     border:2px solid rgba(140,180,255,.55);background:rgba(20,30,70,.35);color:#9cf;
     font:bold 22px monospace;display:flex;align-items:center;justify-content:center;touch-action:none;}
   .tbtn.on{background:rgba(255,150,40,.4);border-color:#fc8;color:#ffe08a;}
-  #padUp{left:96px;bottom:196px;}
-  #padLeft{left:16px;bottom:116px;}
-  #padRight{left:176px;bottom:116px;}
-  #padDown{left:96px;bottom:36px;}
   #tFire{right:16px;bottom:42px;width:112px;height:112px;border-radius:50%;
     border-color:rgba(255,120,80,.65);color:#fa8;}
   #tBoost{right:16px;bottom:164px;font-size:16px;}
   #tPow{right:16px;bottom:250px;font-size:16px;position:absolute;}
   #tPowN{position:absolute;top:-10px;right:-10px;background:#fc4;color:#000;
     border-radius:9px;font:bold 14px monospace;padding:2px 6px;display:none;}
-  #tPause{right:14px;top:12px;width:54px;height:44px;font-size:14px;}
+  #tPause{left:14px;bottom:14px;width:54px;height:44px;font-size:14px;}
   @media (orientation: landscape) and (pointer: coarse){
     .tbtn{width:62px;height:62px;font-size:17px;}
-    #padUp{left:72px;bottom:150px;}
-    #padLeft{left:10px;bottom:88px;}
-    #padRight{left:134px;bottom:88px;}
-    #padDown{left:72px;bottom:26px;}
     #tFire{right:14px;bottom:30px;width:88px;height:88px;}
-    #tBoost{right:116px;bottom:38px;font-size:13px;}
-    #tPow{right:116px;bottom:110px;font-size:13px;}
+    #tBoost{right:14px;bottom:130px;font-size:13px;}
+    #tPow{right:14px;bottom:200px;font-size:13px;}
+    #tPause{left:auto;right:14px;top:12px;bottom:auto;}
   }
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="game" width="640" height="360"></canvas></div>
 <div id="touch">
-  <button class="tbtn" id="padUp">&#x25B2;</button>
-  <button class="tbtn" id="padLeft">&#x25C0;</button>
-  <button class="tbtn" id="padDown">&#x25BC;</button>
-  <button class="tbtn" id="padRight">&#x25B6;</button>
   <button class="tbtn" id="tBoost">BOOST</button>
   <button class="tbtn" id="tPow">PWR<span id="tPowN"></span></button>
   <button class="tbtn" id="tFire">FIRE</button>

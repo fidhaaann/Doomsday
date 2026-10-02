@@ -201,8 +201,7 @@ class Game {
       this.alienT -= dt;
       if (this.alienT <= 0) {
         this.alienT = lvl.alienEvery * D.alien;
-        const side = Math.random() < 0.5 ? -1 : 1;
-        this.aliens.push(new Alien(side, 24 + Math.random() * 60, W / 2 + (Math.random() - 0.5) * 160));
+        this.aliens.push(new Alien(24 + Math.random() * 60, 24 + Math.random() * (W - 48)));
       }
     }
 
@@ -623,44 +622,45 @@ class Game {
     ctx.strokeStyle = 'rgba(80,140,255,0.4)';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(0, band); ctx.lineTo(cw, band); ctx.stroke();
-    const s = Math.max(3, Math.round(band / 38));
+    const top = window.SAFE_TOP_PX || 0;
+    const usable = band - top;
+    const s = Math.max(4, Math.round(usable / 34));
     const gh = 5 * s;
-    const y1 = Math.round(band * 0.08);
-    const y2 = Math.round(band * 0.44);
-    const y3 = Math.round(band * 0.72);
+    const y1 = top + Math.round(usable * 0.07);
+    const y2 = top + Math.round(usable * 0.40);
+    const y3 = top + Math.round(usable * 0.73);
     const xL = Math.round(cw * 0.015);
-    const xE = Math.round(cw * 0.20);
-    const xP = Math.round(cw * 0.42);
-    const xS = Math.round(cw * 0.64);
-    const xW = Math.round(cw * 0.74);   // right column ends before the DOM pause button
+    const xM = Math.round(cw * 0.36);   // mid column
+    const xR = Math.round(cw * 0.58);   // right column
+    // row 1: LEVEL | TIME | SCORE digits
     pixText(ctx, 'LEVEL ' + this.level + '/5', xL, y1, s, '#8ef');
-    pixText(ctx, 'EARTH', xE, y1, s, '#678');
-    pixText(ctx, 'PLAYER', xP, y1, s, '#678');
-    pixText(ctx, 'SCORE', xS, y1, s, '#678');
-    pixText(ctx, 'POWER', xW, y1, s, '#678');
-    pixText(ctx, 'TIME ' + String(t).padStart(2, '0'), xL, y2, s, t <= 10 ? '#f44' : '#fff');
-    const bw = Math.round(cw * 0.19), bh = Math.max(4, Math.round(band * 0.10));
-    this.bar(ctx, xE, y2, bw, bh, this.earth.hp / CFG.earthHp,
+    pixText(ctx, 'TIME ' + String(t).padStart(2, '0'), xM, y1, s, t <= 10 ? '#f44' : '#fff');
+    pixText(ctx, 'SCORE ' + String(this.score).padStart(7, '0'), xR, y1, s, '#ff8');
+    // row 2: EARTH label+bar | PLAYER label+bar
+    const bw = Math.round(cw * 0.18), bh = Math.max(6, Math.round(usable * 0.09));
+    pixText(ctx, 'EARTH', xL, y2, s, '#678');
+    this.bar(ctx, xL + 21 * s, y2 + s, bw, bh, this.earth.hp / CFG.earthHp,
       this.earth.hp > 60 ? '#4af' : this.earth.hp > 30 ? '#fa4' : '#f44');
-    this.bar(ctx, xP, y2, bw, bh, this.player.hp / CFG.playerHp,
+    pixText(ctx, 'PLAYER', xR, y2, s, '#678');
+    this.bar(ctx, xR + 25 * s, y2 + s, bw, bh, this.player.hp / CFG.playerHp,
       this.player.hp > 50 ? '#4f4' : this.player.hp > 25 ? '#fa4' : '#f44');
-    pixText(ctx, String(this.score).padStart(7, '0'), xS, y2, s, '#ff8');
-    if (this.player.stored.length) {
-      const front = this.player.stored[0];
-      pixText(ctx, PU_NAME[front] + (this.player.stored.length > 1 ? ' +' + (this.player.stored.length - 1) : ''), xW, y2, s, PU_COLOR[front]);
-    } else {
-      pixText(ctx, '---', xW, y2, s, '#456');
-    }
-    // row 3: lives + combo + active effects
+    // row 3: LIVES+icons | PWR+value | COMBO
     pixText(ctx, 'LIVES', xL, y3, s, '#678');
     for (let i = 0; i < this.lives; i++) {
-      drawSprite(ctx, 'player_ship2', xL + 23 * s + i * Math.round(5.5 * s), y3 - s, Math.round(4 * s), Math.round(4.5 * s));
+      drawSprite(ctx, 'player_ship2', xL + 24 * s + i * Math.round(5.5 * s), y3 - s, Math.round(4 * s), Math.round(4.5 * s));
     }
-    if (this.combo >= 2) pixText(ctx, 'COMBO X' + this.combo, xS, y3, s, '#8ff');
-    let ey = y3;
-    if (this.player.shield > 0) { pixText(ctx, 'SHIELD ' + Math.ceil(this.player.shield), xP, ey, s, '#4df'); ey += gh + s; }
-    if (this.player.rapid > 0) { pixText(ctx, 'RAPID ' + Math.ceil(this.player.rapid), xP, ey, s, '#f43'); ey += gh + s; }
-    if (this.player.triple > 0) { pixText(ctx, 'TRIPLE ' + Math.ceil(this.player.triple), xP, ey, s, '#4f4'); ey += gh + s; }
+    pixText(ctx, 'PWR', xM, y3, s, '#678');
+    if (this.player.stored.length) {
+      const front = this.player.stored[0];
+      pixText(ctx, PU_NAME[front] + (this.player.stored.length > 1 ? '+' + (this.player.stored.length - 1) : ''), xM + 15 * s, y3, s, PU_COLOR[front]);
+    } else {
+      pixText(ctx, '---', xM + 15 * s, y3, s, '#456');
+    }
+    let ex = xR;
+    if (this.combo >= 2) { pixText(ctx, 'X' + this.combo, ex, y3, s, '#8ff'); ex += 3 * s; }
+    if (this.player.shield > 0) { pixText(ctx, 'SHD' + Math.ceil(this.player.shield), ex, y3, s, '#4df'); ex += 5 * s; }
+    if (this.player.rapid > 0) { pixText(ctx, 'RPD' + Math.ceil(this.player.rapid), ex, y3, s, '#f43'); ex += 5 * s; }
+    if (this.player.triple > 0) { pixText(ctx, 'TRP' + Math.ceil(this.player.triple), ex, y3, s, '#4f4'); ex += 5 * s; }
     ctx.restore();
     // boss bar hangs just under the HUD band
     if (this.boss && this.boss.phase >= 1 && !this.boss.dead) {
