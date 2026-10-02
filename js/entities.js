@@ -197,12 +197,17 @@ class Boss {
       if (this.y >= this.ty) { this.phase = 1; }
       return;
     }
-    // drift toward player — enraged phase chases harder
-    const want = Math.max(60, Math.min(W - 60, game.player.x));
-    const chaseSpd = this.phase >= 3 ? 22 : 12;
-    this.x += Math.sign(want - this.x) * Math.min(Math.abs(want - this.x), chaseSpd * dt);
-    this.x += Math.sin(this.t * 0.7) * 8 * dt;
-    this.y = this.ty + Math.sin(this.t * 0.9) * 3;
+    // drift toward player — enraged phase chases harder.
+    // frozen while the main cannon charges or fires so the beam stays
+    // aligned with the ship's cannon.
+    const firing = this.chargeT > 0 || this.beam > 0;
+    if (!firing) {
+      const want = Math.max(60, Math.min(W - 60, game.player.x));
+      const chaseSpd = this.phase >= 3 ? 22 : 12;
+      this.x += Math.sign(want - this.x) * Math.min(Math.abs(want - this.x), chaseSpd * dt);
+      this.x += Math.sin(this.t * 0.7) * 8 * dt;
+      this.y = this.ty + Math.sin(this.t * 0.9) * 3;
+    }
 
     const p = game.player;
     const dx = p.x - this.x, dy = p.y - this.y;
@@ -255,7 +260,7 @@ class Boss {
     this.mainT -= dt;
     if (this.chargeT > 0) {
       this.chargeT -= dt;
-      if (this.chargeT > 0.35) this.beamX = p.x;   // tracks until the last moment
+      this.beamX = this.x;                  // beam stays aligned with the cannon
       if (this.chargeT <= 0) {
         this.beam = 1.1;
         this.beamEarthHit = false;
@@ -265,7 +270,7 @@ class Boss {
     } else if (this.mainT <= 0) {
       this.mainT = this.phase === 1 ? 12 : 8;
       this.chargeT = 1.5;
-      this.beamX = p.x;
+      this.beamX = this.x;
       AudioMan.charge();
       game.announce('ENERGY SURGE', 1.2, '#f4a');
     }
@@ -277,15 +282,7 @@ class Boss {
         game.earth.damage(9, game);
       }
     }
-    // spawn escorts
-    this.spawnT -= dt;
-    if (this.spawnT <= 0) {
-      this.spawnT = this.phase >= 3 ? 6 : 8;
-      if (game.aliens.length < 3) {
-        const side = Math.random() < 0.5 ? -1 : 1;
-        game.aliens.push(new Alien(30 + Math.random() * 40, Math.max(24, Math.min(W - 24, this.x + side * 60))));
-      }
-    }
+    // no escorts — level 5 is mothership only
     // phase transitions
     if (this.phase === 1 && this.shieldHp <= 0) {
       this.phase = 2;

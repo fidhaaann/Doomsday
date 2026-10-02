@@ -55,7 +55,7 @@ const LEVELS = {
   5: { name: 'THE INVASION',
        sub: 'DESTROY THE MOTHERSHIP',
        spawn: 0.85, speed: [20, 38], types: [],   // no asteroids: mothership + alien escorts only
-       aliens: true, alienEvery: 4.0, alienMax: 4, boss: true, bossAt: 45,
+       aliens: false, alienEvery: 0, alienMax: 0, boss: true, bossAt: 45,
        announce: [[46, 'WARNING'], [45, 'UNKNOWN OBJECT DETECTED']] },
 };
 

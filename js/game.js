@@ -204,6 +204,15 @@ class Game {
         this.aliens.push(new Alien(24 + Math.random() * 60, 24 + Math.random() * (W - 48)));
       }
     }
+    // level 5 has no asteroid/alien drops — power-ups rain from the top instead
+    if (lvl.boss && this.level === 5) {
+      this.puT = (this.puT ?? 5) - dt;
+      if (this.puT <= 0) {
+        this.puT = 8 + Math.random() * 4;
+        const t = POWERUPS[(Math.random() * POWERUPS.length) | 0];
+        this.powerups.push(new PowerUp(14 + Math.random() * (W - 28), -10, t));
+      }
+    }
 
     this.updateWorld(dt, keys);
     this.collide();

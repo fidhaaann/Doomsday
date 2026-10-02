@@ -135,12 +135,6 @@
   const dragEnd = e => { if (e.pointerId === dragId) dragId = null; };
   canvas.addEventListener('pointerup', dragEnd);
   canvas.addEventListener('pointercancel', dragEnd);
-  document.getElementById('tBoost').addEventListener('pointerdown', e => {
-    e.preventDefault();
-    keys['shift'] = !keys['shift'];
-    e.currentTarget.classList.toggle('on', keys['shift']);
-    AudioMan.init();
-  });
   document.getElementById('tPow').addEventListener('pointerdown', e => {
     e.preventDefault();
     if (game) game.handleKey('e');
@@ -168,7 +162,6 @@
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, cw, chh);
     const ls = Math.max(4, Math.round(cw * 0.013));
-    pixText(ctx, 'DOOMSDAY', cw / 2, R.y - Math.round(cw * 0.11), ls, '#e66', 'center');
     ctx.fillStyle = '#f33';
     ctx.fillRect(Math.round(cw * 0.07), R.y - Math.round(cw * 0.075), Math.round(cw * 0.018), Math.round(cw * 0.018));
     pixText(ctx, 'POWER', Math.round(cw * 0.10), R.y - Math.round(cw * 0.068), Math.max(2, Math.round(ls * 0.55)), '#889', 'left');
@@ -185,7 +178,7 @@
     for (let i = 0; i < 6; i++) {
       ctx.fillRect(Math.round(cw * 0.05) + i * Math.round(cw * 0.022), gy, Math.round(cw * 0.008), Math.round(cw * 0.10));
     }
-    pixText(ctx, 'SLIDE ON SCREEN TO MOVE', cw / 2, Math.round(chh * 0.56), Math.max(3, Math.round(cw * 0.009)), '#99a', 'center');
+    pixText(ctx, 'SLIDE ON SCREEN TO MOVE', cw / 2, Math.round(chh * 0.56), Math.max(2, Math.round(cw * 0.005)), '#667', 'center');
   };
 
   let game = null;
