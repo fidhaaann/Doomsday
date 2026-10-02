@@ -4,8 +4,35 @@
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
 
+  const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  window.IS_TOUCH = isTouch;
+
   window.RENDER_SCALE = 2;
+  window.RENDER_SX = 2; window.RENDER_SY = 2;
   function fit() {
+    if (isTouch) {
+      // phone: fill the whole screen, render at device pixel resolution.
+      // world scale is capped at 1.5x aspect distortion — the nebula bg
+      // still covers the full canvas so there are no plain black bars.
+      const dpr = window.devicePixelRatio || 1;
+      canvas.style.width = '100vw';
+      canvas.style.height = '100vh';
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      ctx.imageSmoothingEnabled = false;
+      window.RENDER_SX = canvas.width / W;        // full-fill scale (bg)
+      window.RENDER_SY = canvas.height / H;
+      let wx = window.RENDER_SX, wy = window.RENDER_SY;
+      const MAX_DISTORT = 1.5;
+      if (wx / wy > MAX_DISTORT) wx = wy * MAX_DISTORT;
+      if (wy / wx > MAX_DISTORT) wy = wx * MAX_DISTORT;
+      window.RENDER_WX = wx;
+      window.RENDER_WY = wy;
+      window.RENDER_OX = (canvas.width - W * wx) / 2;
+      window.RENDER_OY = (canvas.height - H * wy) / 2;
+      window.RENDER_SCALE = Math.min(wx, wy);
+      return;
+    }
     const scale = Math.min(window.innerWidth / W, window.innerHeight / H);
     canvas.style.width = (W * scale | 0) + 'px';
     canvas.style.height = (H * scale | 0) + 'px';
@@ -17,6 +44,9 @@
       canvas.height = H * S;
       ctx.imageSmoothingEnabled = false;
       window.RENDER_SCALE = S;
+      window.RENDER_SX = S; window.RENDER_SY = S;
+      window.RENDER_WX = S; window.RENDER_WY = S;
+      window.RENDER_OX = 0; window.RENDER_OY = 0;
     }
   }
   window.addEventListener('resize', fit);
@@ -36,7 +66,6 @@
   window.addEventListener('mousedown', () => AudioMan.init());
 
   // ---- mobile touch controls ----
-  const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   const touchUI = document.getElementById('touch');
   const powBadge = document.getElementById('tPowN');
   function bindHold(id, k) {
@@ -113,9 +142,11 @@
   const BOOT_MIN = 2800;                 // long enough to read the controls
   let loadDone = false, loadProgress = 0;
   function drawBoot(t) {
-    const S = window.RENDER_SCALE || 2;
-    ctx.setTransform(S, 0, 0, S, 0, 0);
+    const WX = window.RENDER_WX || 2, WY = window.RENDER_WY || 2;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#020210';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(WX, 0, 0, WY, window.RENDER_OX || 0, window.RENDER_OY || 0);
     ctx.fillRect(0, 0, W, H);
     for (let i = 0; i < 40; i++) {
       ctx.globalAlpha = 0.3 + 0.7 * Math.abs(Math.sin(t * 0.001 + i * 1.7));

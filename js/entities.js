@@ -432,7 +432,7 @@ class Player {
     if (mx || my) {
       const d = Math.hypot(mx, my);
       this.boosting = !!keys['shift'];
-      const spd = CFG.playerSpeed * (this.boosting ? CFG.boostMul : 1);
+      const spd = CFG.playerSpeed * (this.boosting ? CFG.boostMul : 1) * (window.IS_TOUCH ? 0.62 : 1);
       this.x += mx / d * spd * dt;
       this.y += my / d * spd * dt;
       this.engine += dt * (this.boosting ? 60 : 30);

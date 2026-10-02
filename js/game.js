@@ -487,9 +487,12 @@ class Game {
   // ---------- DRAW ----------
   draw() {
     const ctx = this.ctx;
-    const S = window.RENDER_SCALE || 2;
-    ctx.setTransform(S, 0, 0, S, 0, 0);   // world logic stays 320x180
-    ctx.drawImage(this.bg, 0, 0, W, H);
+    const WX = window.RENDER_WX || window.RENDER_SCALE || 2;
+    const WY = window.RENDER_WY || window.RENDER_SCALE || 2;
+    // nebula bg always fills the whole canvas (no plain black bars on phones)
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(this.bg, 0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform(WX, 0, 0, WY, window.RENDER_OX || 0, window.RENDER_OY || 0);   // world logic stays 320x180
     ctx.save();
     ctx.translate(Math.round(Shake.ox()), Math.round(Shake.oy()));
 
@@ -544,10 +547,12 @@ class Game {
 
   // x,y are logical (320x180) coords; pixel font drawn at device res so blocks stay crisp
   text(ctx, s, x, y, color = '#fff', size = 1, align = 'left') {
-    const S = window.RENDER_SCALE || 2;
+    const WX = window.RENDER_WX || window.RENDER_SCALE || 2;
+    const WY = window.RENDER_WY || window.RENDER_SCALE || 2;
+    const S = Math.min(WX, WY);
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    pixText(ctx, s, Math.round(x * S), Math.round(y * S), Math.max(1, Math.round(size)) * S, color, align);
+    pixText(ctx, s, Math.round((window.RENDER_OX || 0) + x * WX), Math.round((window.RENDER_OY || 0) + y * WY), Math.max(1, Math.round(size)) * S, color, align);
     ctx.restore();
   }
 
