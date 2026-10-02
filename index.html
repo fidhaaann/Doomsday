@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOOMSDAY — 60 SECONDS: LAST DEFENSE</title>
+<link rel="icon" type="image/png" href="assets/player_ship.png">
+<style>
+  html,body{margin:0;padding:0;background:#000;overflow:hidden;height:100%;
+    touch-action:none;overscroll-behavior:none;
+    user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;}
+  body{display:flex;align-items:center;justify-content:center;background:#020208;}
+  #wrap{position:relative;}
+  canvas{
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+    background:#010614;
+    box-shadow:0 0 40px rgba(30,60,160,.35);
+    touch-action:none;
+  }
+  /* ---- mobile touch controls ---- */
+  #touch{display:none;position:fixed;inset:0;z-index:10;pointer-events:none;font-family:monospace;}
+  .tbtn{pointer-events:auto;position:absolute;width:58px;height:58px;border-radius:14px;
+    border:2px solid rgba(140,180,255,.55);background:rgba(20,30,70,.35);color:#9cf;
+    font:bold 16px monospace;display:flex;align-items:center;justify-content:center;touch-action:none;}
+  .tbtn.on{background:rgba(255,150,40,.4);border-color:#fc8;color:#ffe08a;}
+  #padUp{left:74px;bottom:158px;}
+  #padLeft{left:14px;bottom:98px;}
+  #padRight{left:134px;bottom:98px;}
+  #padDown{left:74px;bottom:38px;}
+  #tFire{right:20px;bottom:48px;width:88px;height:88px;border-radius:50%;
+    border-color:rgba(255,120,80,.65);color:#fa8;}
+  #tBoost{right:126px;bottom:56px;font-size:13px;}
+  #tPow{right:126px;bottom:130px;font-size:13px;position:absolute;}
+  #tPowN{position:absolute;top:-8px;right:-8px;background:#fc4;color:#000;
+    border-radius:8px;font:bold 11px monospace;padding:1px 5px;display:none;}
+  #tPause{right:14px;top:12px;width:44px;height:36px;font-size:12px;}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="game" width="640" height="360"></canvas></div>
+<div id="touch">
+  <button class="tbtn" id="padUp">&#x25B2;</button>
+  <button class="tbtn" id="padLeft">&#x25C0;</button>
+  <button class="tbtn" id="padDown">&#x25BC;</button>
+  <button class="tbtn" id="padRight">&#x25B6;</button>
+  <button class="tbtn" id="tBoost">BOOST</button>
+  <button class="tbtn" id="tPow">PWR<span id="tPowN"></span></button>
+  <button class="tbtn" id="tFire">FIRE</button>
+  <button class="tbtn" id="tPause">| |</button>
+</div>
+<script src="js/font.js"></script>
+<script src="js/config.js"></script>
+<script src="js/assets.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/particles.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/game.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
