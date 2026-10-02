@@ -144,6 +144,24 @@
     e.preventDefault();
     if (game) game.handleKey('p');
   });
+  document.getElementById('tHome').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (game) game.handleKey('h');
+  });
+  const tHome = document.getElementById('tHome');
+  const diffUI = document.getElementById('tDiff');
+  document.getElementById('tUp').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (game) game.handleKey('arrowup');
+  });
+  document.getElementById('tDown').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (game) game.handleKey('arrowdown');
+  });
+  document.getElementById('tOk').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (game) game.handleKey('enter');
+  });
   // tap anywhere = SPACE when not in gameplay (menus / transitions)
   canvas.addEventListener('pointerdown', () => {
     if (!game) return;
@@ -197,6 +215,8 @@
         if (isTouch) {
           const inGame = ['intro', 'playing', 'dying', 'paused'].includes(game.state);
           touchUI.style.display = inGame ? 'block' : 'none';
+          tHome.style.display = game.state === 'paused' ? 'flex' : 'none';
+          diffUI.style.display = game.state === 'difficulty' ? 'block' : 'none';
           const n = game.player ? game.player.stored.length : 0;
           powBadge.style.display = n ? 'block' : 'none';
           powBadge.textContent = n;

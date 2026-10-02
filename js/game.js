@@ -462,6 +462,10 @@ class Game {
       this.state = this.state === 'paused' ? 'playing' : 'paused';
       return;
     }
+    if (k === 'h' && this.state !== 'menu') {
+      this.state = 'menu'; this.stateT = 0; this.resetRun();
+      return;
+    }
     if (this.state === 'difficulty') {
       if (k === 'w' || k === 'arrowup') { this.diffSel = (this.diffSel + DIFFS.length - 1) % DIFFS.length; AudioMan.count(); }
       else if (k === 's' || k === 'arrowdown') { this.diffSel = (this.diffSel + 1) % DIFFS.length; AudioMan.count(); }
@@ -811,6 +815,11 @@ class Game {
   drawPaused(ctx) {
     this.dim(ctx, 0.6);
     this.text(ctx, 'PAUSED', W / 2, 78, '#8ef', 3, 'center');
-    this.text(ctx, 'P TO RESUME', W / 2, 98, '#789', 1, 'center');
+    if (window.IS_TOUCH) {
+      this.text(ctx, 'TAP || TO RESUME', W / 2, 98, '#789', 1, 'center');
+      this.text(ctx, 'HOME BUTTON - EXIT TO MENU', W / 2, 110, '#567', 1, 'center');
+    } else {
+      this.text(ctx, 'P TO RESUME   H - MENU', W / 2, 98, '#789', 1, 'center');
+    }
   }
 }

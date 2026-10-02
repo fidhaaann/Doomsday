@@ -30,11 +30,20 @@
   #tPowN{position:absolute;top:-10px;right:-10px;background:#fc4;color:#000;
     border-radius:9px;font:bold 14px monospace;padding:2px 6px;display:none;}
   #tPause{right:3vw;top:2vh;width:13vmin;height:6.5vmin;font-size:3vmin;border-radius:3vmin;}
+  #tHome{left:3vw;top:2vh;width:16vmin;height:6.5vmin;font-size:2.8vmin;border-radius:3vmin;display:none;}
+  #tDiff{display:none;position:fixed;inset:0;z-index:10;pointer-events:none;font-family:monospace;}
+  #tUp{left:6vw;bottom:26vh;}
+  #tDown{left:6vw;bottom:8vh;}
+  #tOk{right:6vw;bottom:8vh;width:22vmin;border-color:rgba(120,255,140,.6);color:#8f8;}
   @media (orientation: landscape) and (pointer: coarse){
     .tbtn{width:62px;height:62px;font-size:17px;}
     #tFire{right:14px;bottom:50px;width:88px;height:88px;}
     #tPow{left:14px;bottom:160px;font-size:13px;}
     #tPause{left:auto;right:14px;top:12px;bottom:auto;}
+    #tHome{left:14px;top:12px;width:auto;padding:0 12px;height:40px;font-size:12px;}
+    #tUp{left:14px;bottom:240px;}
+    #tDown{left:14px;bottom:320px;}
+    #tOk{right:14px;bottom:240px;width:110px;}
   }
 </style>
 </head>
@@ -44,6 +53,12 @@
   <button class="tbtn" id="tPow">PWR<span id="tPowN"></span></button>
   <button class="tbtn" id="tFire">FIRE</button>
   <button class="tbtn" id="tPause">| |</button>
+  <button class="tbtn" id="tHome">HOME</button>
+</div>
+<div id="tDiff">
+  <button class="tbtn" id="tUp">▲</button>
+  <button class="tbtn" id="tDown">▼</button>
+  <button class="tbtn" id="tOk">OK</button>
 </div>
 <script src="js/font.js"></script>
 <script src="js/config.js"></script>
