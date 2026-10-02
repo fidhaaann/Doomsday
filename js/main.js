@@ -33,22 +33,19 @@
         // Game Boy layout: framed screen up top, console body + buttons below.
         // The screen never reaches the URL bar, so the in-screen HUD stays visible.
         window.HUD_PX = 0;                       // HUD draws inside the screen
-        const m = Math.round(canvas.width * 0.022);
         const scrX = Math.round(canvas.width * 0.045);
         const scrW = canvas.width - 2 * scrX;
         const scrY = window.SAFE_TOP_PX + Math.round(canvas.width * 0.16);
-        const scrH = Math.round(canvas.height * 0.46);
-        window.CONSOLE = { x: scrX, y: scrY, w: scrW, h: scrH };
-        const ww = scrW - 2 * m, wh = scrH - 2 * m;
-        let wx = ww / W, wy = wh / H;
-        const MAX_DISTORT = 1.55;
-        if (wy / wx > MAX_DISTORT) wy = wx * MAX_DISTORT;
-        if (wx / wy > MAX_DISTORT) wx = wy * MAX_DISTORT;
-        window.RENDER_WX = wx;
-        window.RENDER_WY = wy;
-        window.RENDER_OX = scrX + m + (ww - W * wx) / 2;
-        window.RENDER_OY = scrY + m + (wh - H * wy) / 2;
-        window.RENDER_SCALE = Math.min(wx, wy);
+        // bezel sized to the world's aspect (1.75x vertical) so the game
+        // fills the screen edge to edge — no gaps inside the frame
+        const scrH = Math.round(scrW * (H / W) * 1.75);
+        const bz = Math.max(4, Math.round(canvas.width * 0.008));
+        window.CONSOLE = { x: scrX, y: scrY, w: scrW, h: scrH, b: bz };
+        window.RENDER_WX = (scrW - 2 * bz) / W;
+        window.RENDER_WY = (scrH - 2 * bz) / H;
+        window.RENDER_OX = scrX + bz;
+        window.RENDER_OY = scrY + bz;
+        window.RENDER_SCALE = Math.min(window.RENDER_WX, window.RENDER_WY);
         return;
       }
       window.HUD_PX = 0;

@@ -490,6 +490,11 @@ class Game {
     if (window.CONSOLE) {
       window.drawConsoleShell();
       ctx.drawImage(this.bg, window.RENDER_OX, window.RENDER_OY, W * WX, H * WY);
+      // keep everything inside the console screen
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(window.RENDER_OX, window.RENDER_OY, W * WX, H * WY);
+      ctx.clip();
     } else {
       ctx.drawImage(this.bg, 0, 0, ctx.canvas.width, ctx.canvas.height);
     }
@@ -544,6 +549,7 @@ class Game {
       case 'paused': this.drawPaused(ctx); break;
     }
     if (window.HUD_PX && this.state !== 'menu' && this.state !== 'difficulty') this.drawHUDScreen(ctx);
+    if (window.CONSOLE) ctx.restore();   // pop the screen clip
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
